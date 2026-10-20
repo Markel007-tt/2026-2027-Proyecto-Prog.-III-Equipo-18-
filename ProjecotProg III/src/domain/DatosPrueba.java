@@ -275,6 +275,11 @@ public class DatosPrueba {
 		hugoCorriente.retirar(590, "Alquiler");
 		hugo.getCuentas().add(hugoCorriente);
 		usuarios.add(hugo);
+		
+		// ---------- Administrador (único) ----------
+		Usuario admin = new Usuario("admin", "admin1234", "Administrador");
+		admin.setAdmin(true);
+		usuarios.add(admin);
 
 		return usuarios;
 	}
