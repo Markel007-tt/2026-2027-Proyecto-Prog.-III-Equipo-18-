@@ -61,16 +61,19 @@ public class VentanaPrincipal extends JFrame {
 		setLocationRelativeTo(null); // Centra la ventana en la pantalla.
 	}
 
-	// Construye el resumen bancario del cliente mostrando su saldo total
-	// y el número de cuentas que tiene registradas.
+	// Construye la pestaña "Resumen" del cliente. Sigue el boceto de la entrega:
+	// el resumen de saldo arriba (funcionalidad 5) y la tabla de cuentas en el centro (funcionalidad 4).
 	private JPanel crearPanelResumen() {
-		// String.format permite dar formato al saldo con dos decimales
-		// y separadores de miles. %d representa el número de cuentas.
-		String texto = String.format("Saldo total: %,.2f €   |   Cuentas: %d", usuario.getSaldoTotal(),
-				usuario.getCuentas().size());
+		// BorderLayout con 10 píxeles de separación vertical entre la zona de arriba y la del centro.
+		JPanel panel = new JPanel(new BorderLayout(0, 10));
+		panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Márgenes para separar el contenido de los bordes de la pestaña.
 
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(new JLabel(texto, SwingConstants.CENTER), BorderLayout.CENTER); // Mostramos el resumen centrado en el panel.
+		// FUNCIONALIDAD 5: saldo total y número de cuentas (clase PanelResumenSaldo), arriba.
+		//DESCOMENTAR_LUEGO panel.add(new PanelResumenSaldo(usuario), BorderLayout.NORTH);
+
+		// FUNCIONALIDAD 4: tabla con IBAN, tipo y saldo de cada cuenta (clase PanelListadoCuentas), ocupando el centro.
+		panel.add(new PanelListadoCuentas(usuario), BorderLayout.CENTER);
+
 		return panel; // Devolvemos el panel para añadirlo a la pestaña correspondiente.
 	}
 
