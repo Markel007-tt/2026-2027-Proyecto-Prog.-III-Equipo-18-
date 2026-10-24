@@ -68,10 +68,10 @@ public class VentanaPrincipal extends JFrame {
 		JPanel panel = new JPanel(new BorderLayout(0, 10));
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Márgenes para separar el contenido de los bordes de la pestaña.
 
-		// FUNCIONALIDAD 5: saldo total y número de cuentas (clase PanelResumenSaldo), arriba.
+		// Saldo total y número de cuentas (clase PanelResumenSaldo), arriba.
 		panel.add(new PanelResumenSaldo(usuario), BorderLayout.NORTH);
 
-		// FUNCIONALIDAD 4: tabla con IBAN, tipo y saldo de cada cuenta (clase PanelListadoCuentas), ocupando el centro.
+		// Tabla con IBAN, tipo y saldo de cada cuenta (clase PanelListadoCuentas), ocupando el centro.
 		panel.add(new PanelListadoCuentas(usuario), BorderLayout.CENTER);
 
 		return panel; // Devolvemos el panel para añadirlo a la pestaña correspondiente.

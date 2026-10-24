@@ -55,8 +55,8 @@ public class PanelListadoCuentas extends JPanel {
 
 		// Los números se leen mejor alineados a la derecha, así que creamos un renderer (el que "pinta" las celdas)
 		// y le decimos que alinee el texto a la derecha.
-		DefaultTableCellRenderer alineadoDerecha = new DefaultTableCellRenderer();
-		alineadoDerecha.setHorizontalAlignment(SwingConstants.RIGHT);
+		DefaultTableCellRenderer alineadoDerecha = new DefaultTableCellRenderer(); //Hecho con IA y he preguntar al chatbot 
+		alineadoDerecha.setHorizontalAlignment(SwingConstants.RIGHT);				// sobre el DefaultTableCellRenderer
 
 		// Aplicamos ese renderer solo a la columna del saldo , la 3ª, que es el índice 2 porque se empieza en 0.
 		tabla.getColumnModel().getColumn(2).setCellRenderer(alineadoDerecha);
@@ -75,7 +75,7 @@ public class PanelListadoCuentas extends JPanel {
 		modelo.setRowCount(0); // Borramos todas las filas actuales para no duplicar cuentas al volver a cargar.
 
 		// Recorremos las cuentas del usuario; "c" es cada una de ellas en cada vuelta del bucle.
-		for (Cuenta c : usuario.getCuentas()) {
+		for (Cuenta c : usuario.getCuentas()) { //Hecho con IA desde 78 a 87.
 			// Cada fila es un array de objetos: uno por columna, en el mismo orden que "columnas".
 			Object[] fila = {
 					c.getIban(), // Columna 1: IBAN de la cuenta.

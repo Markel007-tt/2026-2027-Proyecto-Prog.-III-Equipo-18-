@@ -37,7 +37,7 @@ public class PanelResumenSaldo extends JPanel {
 	// Lo usamos dos veces, así no repetimos el mismo código para cada recuadro.
 	private JPanel crearRecuadro(String titulo, JLabel valor) {
 		JPanel recuadro = new JPanel(new BorderLayout()); // Panel con BorderLayout para centrar la etiqueta del valor.
-		recuadro.setBorder(BorderFactory.createTitledBorder(titulo)); // Borde con el título arriba a la izquierda.
+		recuadro.setBorder(BorderFactory.createTitledBorder(titulo)); // Hecho por IA desde linea 40 a 48. Borde con el título arriba a la izquierda.
 
 		// deriveFont crea una copia de la fuente actual con otro estilo y tamaño: negrita y 22 puntos.
 		// Se escribe 22f (con f) porque el tamaño tiene que ser un float.
