@@ -78,6 +78,10 @@ public class PanelListadoCuentas extends JPanel {
 		btnCrearCuenta.addActionListener(e -> mostrarDialogoCrearCuenta());
 				
 		panelBotones.add(btnCrearCuenta);
+		// Botón de eliminar
+		JButton btnEliminarCuenta = new JButton("Eliminar Cuenta");
+		btnEliminarCuenta.addActionListener(e -> eliminarCuentaSeleccionada());
+		panelBotones.add(btnEliminarCuenta);
 		add(panelBotones, BorderLayout.SOUTH);
 
 		actualizar(); // Rellenamos la tabla por primera vez con las cuentas del usuario.
@@ -112,6 +116,38 @@ public class PanelListadoCuentas extends JPanel {
 				"Cuenta creada con éxito.\nTu nuevo IBAN es: " + nuevoIban, 
 				"Cuenta creada", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 	}
+	// Método para eliminar cuenta comprobando saldo y confirmando
+	private void eliminarCuentaSeleccionada() {
+		int fila = tabla.getSelectedRow();
+		if (fila == -1) {
+			javax.swing.JOptionPane.showMessageDialog(this, "Selecciona una cuenta de la tabla primero.", "Error", javax.swing.JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		String iban = (String) modelo.getValueAt(fila, 0);
+		Cuenta cuenta = null;
+		for (Cuenta c : usuario.getCuentas()) {
+			if (c.getIban().equals(iban)) {
+				cuenta = c; break;
+			}
+		}
+
+		// Comprueba si el saldo es 0
+		if (cuenta != null && cuenta.getSaldo() != 0) {
+			javax.swing.JOptionPane.showMessageDialog(this, "Solo se pueden eliminar cuentas con saldo 0,00 €.", "Saldo mayor que cero", javax.swing.JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Pregunta si estás seguro
+		int seguro = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro que quieres borrar la cuenta " + iban + "?", "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION);
+		
+		if (seguro == javax.swing.JOptionPane.YES_OPTION) {
+			usuario.getCuentas().remove(cuenta);
+			actualizar();
+			alCambiarCuentas.run();
+			javax.swing.JOptionPane.showMessageDialog(this, "Cuenta eliminada.", "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+		}
+	}	
 	// Vuelve a cargar la tabla con las cuentas actuales del usuario.
 	// Se llamará cuando cambien los datos. Crear cuenta, depositar, retirar...
 	// IMPORTANTE para el tema de hilos: si se llama desde otro hilo (por ejemplo un cajero),
