@@ -1,8 +1,10 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -11,6 +13,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import domain.Banco;
 import domain.Cuenta;
 import domain.Usuario;
 
@@ -24,11 +27,14 @@ public class PanelListadoCuentas extends JPanel {
 	private Usuario usuario;          
 	private DefaultTableModel modelo; // Modelo los DATOS de la tabla. La tabla solo los dibuja
 	private JTable tabla;             // Tabla visual que se ve en pantalla y que lee los datos del modelo.
-
+	private List<Usuario> usuarios;    // Para verificar si el nuevo IBAN está libre
+	private Runnable alCambiarCuentas; // Para avisar a la ventana de que actualice saldos
 	// Constructor: recibe el usuario que ha iniciado sesión y construye el panel entero.
-	public PanelListadoCuentas(Usuario usuario) {
+	public PanelListadoCuentas(Usuario usuario, List<Usuario> usuarios, Runnable alCambiarCuentas) {
 		this.usuario = usuario; // Guardamos el usuario para poder leer sus cuentas .
-
+		this.usuarios = usuarios;
+		this.alCambiarCuentas = alCambiarCuentas;
+		
 		setLayout(new BorderLayout()); // BorderLayout: así el scroll con la tabla ocupa todo el panel.
 		setBorder(BorderFactory.createTitledBorder("Mis cuentas")); // Borde con el título "Mis cuentas".
 
@@ -63,10 +69,49 @@ public class PanelListadoCuentas extends JPanel {
 
 		// Metemos la tabla en un JScrollPane: sin él no se verían las cabeceras y no habría barra de desplazamiento.
 		add(new JScrollPane(tabla), BorderLayout.CENTER);
+		
+		// Panel inferior con botón alineado a la derecha
+		JPanel panelBotones = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+		JButton btnCrearCuenta = new JButton("Nueva Cuenta");
+				
+		// Al hacer clic, lanza el menú de creación
+		btnCrearCuenta.addActionListener(e -> mostrarDialogoCrearCuenta());
+				
+		panelBotones.add(btnCrearCuenta);
+		add(panelBotones, BorderLayout.SOUTH);
 
 		actualizar(); // Rellenamos la tabla por primera vez con las cuentas del usuario.
 	}
-
+	
+	// Muestra un menú, pide un IBAN nuevo al banco y crea la cuenta elegida
+	private void mostrarDialogoCrearCuenta() {
+		String[] opciones = {"Corriente", "Ahorro", "Cancelar"};
+		int eleccion = javax.swing.JOptionPane.showOptionDialog(this,
+				"¿Qué tipo de cuenta deseas abrir?", "Abrir nueva cuenta",
+				javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE,
+				null, opciones, opciones[0]);
+			
+		// Cancela si el usuario cierra la ventana o elige "Cancelar"
+		if (eleccion == 2 || eleccion == javax.swing.JOptionPane.CLOSED_OPTION) return; 
+			
+		String nuevoIban = Banco.generarIbanNuevo(usuarios);
+		Cuenta nuevaCuenta;
+			
+		// 0 es Corriente (con 500€ de descubierto), 1 es Ahorro
+		if (eleccion == 0) {
+			nuevaCuenta = new domain.CuentaCorriente(nuevoIban, usuario.getNombreUsuario(), 0, 500);
+		} else {
+			nuevaCuenta = new domain.CuentaAhorro(nuevoIban, usuario.getNombreUsuario(), 0);
+		}
+			
+		// Añade la cuenta al usuario y pide a la ventana principal que redibuje los datos
+		usuario.getCuentas().add(nuevaCuenta);
+		alCambiarCuentas.run();
+			
+		javax.swing.JOptionPane.showMessageDialog(this, 
+				"Cuenta creada con éxito.\nTu nuevo IBAN es: " + nuevoIban, 
+				"Cuenta creada", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+	}
 	// Vuelve a cargar la tabla con las cuentas actuales del usuario.
 	// Se llamará cuando cambien los datos. Crear cuenta, depositar, retirar...
 	// IMPORTANTE para el tema de hilos: si se llama desde otro hilo (por ejemplo un cajero),

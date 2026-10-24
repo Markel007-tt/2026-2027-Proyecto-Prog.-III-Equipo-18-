@@ -46,7 +46,7 @@ public class VentanaRegistro extends JDialog {
     private JPanel formulario = new JPanel(new GridLayout(0, 1, 5, 5));
 
     public VentanaRegistro(VentanaLogin padre) { //Nombre del panel de Registro
-        super(padre, "Crear cuenta - Nuevo cliente", true);
+        super(padre, "Registro de Nuevo Cliente", true);
         this.padre = padre;
 
         formulario.setBorder(
@@ -80,7 +80,7 @@ public class VentanaRegistro extends JDialog {
         lblError.setForeground(Color.RED);
 
         // Botones para crear la cuenta o cancelar el registro.
-        JButton btnCrear = new JButton("Crear cuenta");
+        JButton btnCrear = new JButton("Registrarse");
         btnCrear.addActionListener(e -> crearCuenta());
 
         JButton btnCancelar = new JButton("Cancelar");

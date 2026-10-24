@@ -44,7 +44,7 @@ public class VentanaLogin extends JFrame {
 		JButton btnEntrar = new JButton("Entrar");
 		btnEntrar.addActionListener(e -> intentarLogin()); // Llama al método que comprueba el usuario y la contraseña.
 
-		JButton btnCrearCuenta = new JButton("Crear cuenta");
+		JButton btnCrearCuenta = new JButton("Registrarse");
 		btnCrearCuenta.addActionListener(e -> new VentanaRegistro(this).setVisible(true)); // Abre la ventana de registro y le pasa esta ventana como referencia.
 
 		// Agrupamos los dos botones en un panel para colocarlos juntos.

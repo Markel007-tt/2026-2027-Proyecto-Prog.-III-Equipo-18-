@@ -77,7 +77,8 @@ public class VentanaPrincipal extends JFrame {
 		  panel.add(panelResumenSaldo, BorderLayout.NORTH);
 
 		// Tabla con IBAN, tipo y saldo de cada cuenta (clase PanelListadoCuentas), ocupando el centro.
-		  panelListadoCuentas = new PanelListadoCuentas(usuario);
+		// Pasamos la lista de usuarios y el método para refrescar toda la vista
+			panelListadoCuentas = new PanelListadoCuentas(usuario, usuarios, this::actualizarResumen);
 		  panel.add(panelListadoCuentas, BorderLayout.CENTER);
 
 		return panel; // Devolvemos el panel para añadirlo a la pestaña correspondiente.

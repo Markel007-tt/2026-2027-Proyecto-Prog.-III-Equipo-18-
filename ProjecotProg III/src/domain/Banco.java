@@ -87,4 +87,17 @@ public class Banco {
 		destino.recibirTransferencia(cantidad, conceptoRecibida);
 		return ResultadoTransferencia.OK;
 	}
+	// Genera un IBAN aleatorio con el formato "ES01-XXXX" comprobando que no exista ya.
+		public static String generarIbanNuevo(List<Usuario> usuarios) {
+			String iban;
+			do {
+				// Genera un número aleatorio entre 1000 y 9999
+				int numero = (int) (Math.random() * 9000) + 1000;
+				iban = "ES01-" + numero;
+				
+			// Reutilizamos el método buscarCuenta: si devuelve algo distinto de null, el IBAN ya existe y repetimos.
+			} while (buscarCuenta(usuarios, iban) != null); 
+			
+			return iban;
+		}
 }
