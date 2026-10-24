@@ -15,7 +15,6 @@ import domain.Usuario;
 // Panel con dos recuadros: el saldo total del usuario y el número de cuentas que tiene.
 public class PanelResumenSaldo extends JPanel {
 
-	// Número de versión de la clase. Java lo pide en todas las clases que heredan de un componente Swing.
 	private static final long serialVersionUID = 1L;
 
 	private Usuario usuario;                         // Usuario del que se calcula el resumen.
