@@ -22,7 +22,11 @@ public class VentanaPrincipal extends JFrame {
 
 	private Usuario usuario;        // Usuario que ha iniciado sesión y cuyos datos se mostrarán.
 	private List<Usuario> usuarios; // Lista completa de usuarios, necesaria para volver al login.
-
+  	// Paneles de la pestaña "Resumen". Se guardan como campos para poder refrescarlos
+  	// con su método actualizar() después de una transferencia.
+  	private PanelResumenSaldo panelResumenSaldo;
+  	private PanelListadoCuentas panelListadoCuentas;
+	
 	public VentanaPrincipal(Usuario usuario, List<Usuario> usuarios) {
 		super("Banco Concurrente");
 		this.usuario = usuario;
@@ -48,7 +52,7 @@ public class VentanaPrincipal extends JFrame {
 			// Los clientes pueden consultar su resumen y acceder a las secciones
 			// de transferencias e histórico, que todavía están pendientes de implementar.
 			pestanas.addTab("Resumen", crearPanelResumen());
-			pestanas.addTab("Transferir", crearPanelPendiente());
+			pestanas.addTab("Transferir", new PanelTransferencia(usuario, usuarios, this::actualizarResumen));
 			pestanas.addTab("Histórico", crearPanelPendiente());
 		}
 
@@ -69,14 +73,23 @@ public class VentanaPrincipal extends JFrame {
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Márgenes para separar el contenido de los bordes de la pestaña.
 
 		// Saldo total y número de cuentas (clase PanelResumenSaldo), arriba.
-		panel.add(new PanelResumenSaldo(usuario), BorderLayout.NORTH);
+		  panelResumenSaldo = new PanelResumenSaldo(usuario);
+		  panel.add(panelResumenSaldo, BorderLayout.NORTH);
 
 		// Tabla con IBAN, tipo y saldo de cada cuenta (clase PanelListadoCuentas), ocupando el centro.
-		panel.add(new PanelListadoCuentas(usuario), BorderLayout.CENTER);
+		  panelListadoCuentas = new PanelListadoCuentas(usuario);
+		  panel.add(panelListadoCuentas, BorderLayout.CENTER);
 
 		return panel; // Devolvemos el panel para añadirlo a la pestaña correspondiente.
 	}
 
+  	// Vuelve a calcular el resumen de saldo y a cargar la tabla de cuentas con los datos actuales.
+  	// Lo llama PanelTransferencia después de cada transferencia correcta.
+  	private void actualizarResumen() {
+  		panelResumenSaldo.actualizar();   // Saldo total y número de cuentas.
+  		panelListadoCuentas.actualizar(); // Tabla con el saldo de cada cuenta.
+  	}
+	
 	// Crea un panel provisional para las secciones que todavía no están implementadas.
 	private JPanel crearPanelPendiente() {
 		JPanel panel = new JPanel(new BorderLayout());

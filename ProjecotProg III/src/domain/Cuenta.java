@@ -64,7 +64,33 @@ public abstract class Cuenta {
 		movimientos.add(new Movimiento(LocalDate.now(), TipoMovimiento.RETIRO, -cantidad, concepto, saldo));
 		return true;
 	}
+	
+	// Saca dinero de la cuenta por una TRANSFERENCIA a otra cuenta.
+	// Funciona como retirar(), pero el movimiento se guarda como TRANSFERENCIA_ENVIADA.
+	// Devuelve true si se ha hecho y false si se ha rechazado (saldo insuficiente).
+	public boolean enviarTransferencia(double cantidad, String concepto) {
 
+		if (cantidad <= 0 || !puedeRetirar(cantidad)) {
+			return false;
+		}
+		saldo = saldo - cantidad;
+
+		// Negativo porque sale dinero
+		movimientos.add(new Movimiento(LocalDate.now(), TipoMovimiento.TRANSFERENCIA_ENVIADA, -cantidad, concepto, saldo));
+		return true;
+	}
+
+	// Ingresa dinero que llega por una TRANSFERENCIA de otra cuenta.
+	// El movimiento se guarda como TRANSFERENCIA_RECIBIDA (cantidad positiva).
+	public void recibirTransferencia(double cantidad, String concepto) {
+
+		if (cantidad <= 0) {
+			return;
+		}
+		saldo = saldo + cantidad;
+		movimientos.add(new Movimiento(LocalDate.now(), TipoMovimiento.TRANSFERENCIA_RECIBIDA, cantidad, concepto, saldo));
+	}
+	
 	// Getters y setters 
 
 	public String getIban() {
