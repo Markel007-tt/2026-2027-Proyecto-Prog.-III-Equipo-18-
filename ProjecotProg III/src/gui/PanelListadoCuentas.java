@@ -72,6 +72,23 @@ public class PanelListadoCuentas extends JPanel {
 		
 		// Panel inferior con botón alineado a la derecha
 		JPanel panelBotones = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+		
+		// Desplegable para ordenar cuentas
+		javax.swing.JComboBox<String> comboOrdenar = new javax.swing.JComboBox<>(new String[]{"Ordenar por IBAN", "Ordenar por Saldo"});
+				
+		// Cuando el usuario elige una opción distinta, ejecutamos esto:
+		comboOrdenar.addActionListener(e -> {
+			if (comboOrdenar.getSelectedIndex() == 0) {
+				// Opción 0 (IBAN): Ordena alfabéticamente
+				usuario.getCuentas().sort((c1, c2) -> c1.getIban().compareTo(c2.getIban()));
+			} else {
+				// Opción 1 (Saldo): Ordena de mayor a menor dinero
+				usuario.getCuentas().sort((c1, c2) -> Double.compare(c2.getSaldo(), c1.getSaldo()));
+			}
+			actualizar(); // Redibujamos la tabla automáticamente
+		});
+		panelBotones.add(comboOrdenar); // Lo añadimos al panel abajo a la derecha
+		
 		JButton btnCrearCuenta = new JButton("Nueva Cuenta");
 				
 		// Al hacer clic, lanza el menú de creación
