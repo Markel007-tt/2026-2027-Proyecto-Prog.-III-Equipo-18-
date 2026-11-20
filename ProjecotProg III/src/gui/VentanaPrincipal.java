@@ -26,6 +26,7 @@ public class VentanaPrincipal extends JFrame {
   	// con su método actualizar() después de una transferencia.
   	private PanelResumenSaldo panelResumenSaldo;
   	private PanelListadoCuentas panelListadoCuentas;
+	private PanelHistorico panelHistorico;
 	
 	public VentanaPrincipal(Usuario usuario, List<Usuario> usuarios) {
 		super("Banco Concurrente");
@@ -49,11 +50,11 @@ public class VentanaPrincipal extends JFrame {
 			// El administrador solo dispone, por ahora, de la pestaña de gestión de clientes.
 			pestanas.addTab("Gestión de clientes", crearPanelPendiente());
 		} else {
-			// Los clientes pueden consultar su resumen y acceder a las secciones
-			// de transferencias e histórico, que todavía están pendientes de implementar.
+			// Los clientes pueden consultar su resumen, transferir y ver su histórico.
 			pestanas.addTab("Resumen", crearPanelResumen());
 			pestanas.addTab("Transferir", new PanelTransferencia(usuario, usuarios, this::actualizarResumen));
-			pestanas.addTab("Histórico", crearPanelPendiente());
+			panelHistorico = new PanelHistorico(usuario);
+			pestanas.addTab("Histórico", panelHistorico);
 		}
 
 		// Colocamos la cabecera en la parte superior y las pestañas en el centro.
@@ -86,10 +87,11 @@ public class VentanaPrincipal extends JFrame {
 
   	// Vuelve a calcular el resumen de saldo y a cargar la tabla de cuentas con los datos actuales.
   	// Lo llama PanelTransferencia después de cada transferencia correcta.
-  	private void actualizarResumen() {
-  		panelResumenSaldo.actualizar();   // Saldo total y número de cuentas.
-  		panelListadoCuentas.actualizar(); // Tabla con el saldo de cada cuenta.
-  	}
+	private void actualizarResumen() {
+		panelResumenSaldo.actualizar();
+		panelListadoCuentas.actualizar();
+		panelHistorico.actualizar(); // el histórico también se entera
+	}
 	
 	// Crea un panel provisional para las secciones que todavía no están implementadas.
 	private JPanel crearPanelPendiente() {
