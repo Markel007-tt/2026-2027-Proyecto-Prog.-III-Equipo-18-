@@ -93,14 +93,6 @@ public class PanelTransferencia extends JPanel {
 		add(centro, BorderLayout.CENTER);
 		add(lblMensaje, BorderLayout.SOUTH);
 
-		// Si el usuario aún no tiene cuentas no puede transferir nada
-		if (usuario.getCuentas().isEmpty()) {
-			btnTransferir.setEnabled(false);
-			txtIbanDestino.setEnabled(false);
-			txtCantidad.setEnabled(false);
-			txtConcepto.setEnabled(false);
-			mostrarError("No tienes ninguna cuenta desde la que transferir");
-		}
 	}
 
 	// Añade una fila (etiqueta + componente) al formulario en la posición "fila".
@@ -119,16 +111,29 @@ public class PanelTransferencia extends JPanel {
 		formulario.add(campo, gbc);
 	}
 
-	// Vuelve a cargar las cuentas del usuario en el desplegable (para que se vean los saldos actualizados)
-	// y mantiene seleccionada la misma cuenta que estaba elegida.
-	private void recargarCuentas() {
-		int seleccion = cmbOrigen.getSelectedIndex();
+	// Vuelve a cargar las cuentas del usuario en el desplegable (saldos actualizados,
+	// cuentas nuevas o eliminadas) y mantiene seleccionada la misma cuenta si sigue existiendo.
+	// Es public porque lo llama VentanaPrincipal cuando cambian los datos.
+	public void recargarCuentas() {
+		Cuenta elegida = (Cuenta) cmbOrigen.getSelectedItem(); // recordamos la cuenta elegida
 		cmbOrigen.removeAllItems();
 		for (Cuenta c : usuario.getCuentas()) {
 			cmbOrigen.addItem(c);
 		}
-		if (seleccion >= 0 && seleccion < cmbOrigen.getItemCount()) {
-			cmbOrigen.setSelectedIndex(seleccion);
+		if (elegida != null && usuario.getCuentas().contains(elegida)) {
+			cmbOrigen.setSelectedItem(elegida);
+		}
+
+		// Si no hay cuentas no se puede transferir: se desactiva el formulario
+		boolean hayCuentas = !usuario.getCuentas().isEmpty();
+		btnTransferir.setEnabled(hayCuentas);
+		txtIbanDestino.setEnabled(hayCuentas);
+		txtCantidad.setEnabled(hayCuentas);
+		txtConcepto.setEnabled(hayCuentas);
+		if (hayCuentas) {
+			lblMensaje.setText(" ");
+		} else {
+			mostrarError("No tienes ninguna cuenta desde la que transferir");
 		}
 	}
 

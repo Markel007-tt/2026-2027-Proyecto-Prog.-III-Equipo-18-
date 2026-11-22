@@ -27,6 +27,7 @@ public class VentanaPrincipal extends JFrame {
   	private PanelResumenSaldo panelResumenSaldo;
   	private PanelListadoCuentas panelListadoCuentas;
 	private PanelHistorico panelHistorico;
+	private PanelTransferencia panelTransferencia;
 	
 	public VentanaPrincipal(Usuario usuario, List<Usuario> usuarios) {
 		super("Banco Concurrente");
@@ -52,7 +53,8 @@ public class VentanaPrincipal extends JFrame {
 		} else {
 			// Los clientes pueden consultar su resumen, transferir y ver su histórico.
 			pestanas.addTab("Resumen", crearPanelResumen());
-			pestanas.addTab("Transferir", new PanelTransferencia(usuario, usuarios, this::actualizarResumen));
+			panelTransferencia = new PanelTransferencia(usuario, usuarios, this::actualizarResumen);
+			pestanas.addTab("Transferir", panelTransferencia);
 			panelHistorico = new PanelHistorico(usuario);
 			pestanas.addTab("Histórico", panelHistorico);
 		}
@@ -91,6 +93,7 @@ public class VentanaPrincipal extends JFrame {
 		panelResumenSaldo.actualizar();
 		panelListadoCuentas.actualizar();
 		panelHistorico.actualizar(); // el histórico también se entera
+		panelTransferencia.recargarCuentas(); // el desplegable de Transferir también se entera
 	}
 	
 	// Crea un panel provisional para las secciones que todavía no están implementadas.
