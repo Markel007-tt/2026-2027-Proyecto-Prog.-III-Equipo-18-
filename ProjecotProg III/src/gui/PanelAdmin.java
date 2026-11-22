@@ -3,12 +3,15 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -105,9 +108,14 @@ public class PanelAdmin extends JPanel {
 
 		add(new JScrollPane(tabla), BorderLayout.CENTER); // sin JScrollPane no se ven las cabeceras
 
-		// ---------- SOUTH: totales ----------
-		lblTotales.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // margen interior
-		add(lblTotales, BorderLayout.SOUTH);
+		// ---------- SOUTH: totales a la izquierda y botón a la derecha ----------
+		JButton btnEliminar = new JButton("Eliminar cliente");
+
+		JPanel panelInferior = new JPanel(new BorderLayout());
+		panelInferior.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // margen interior
+		panelInferior.add(lblTotales, BorderLayout.WEST);
+		panelInferior.add(btnEliminar, BorderLayout.EAST);
+		add(panelInferior, BorderLayout.SOUTH);
 
 		// ---------- Eventos ----------
 
@@ -138,6 +146,14 @@ public class PanelAdmin extends JPanel {
 						mostrarCuentas(modelo.getCliente(fila)); // el cliente se pide al MODELO (por el buscador)
 					}
 				}
+			}
+		});
+
+		// Botón Eliminar cliente
+		btnEliminar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				eliminarCliente();
 			}
 		});
 
@@ -188,5 +204,42 @@ public class PanelAdmin extends JPanel {
 		}
 
 		JOptionPane.showMessageDialog(this, texto, "Cuentas del cliente", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	// Elimina el cliente seleccionado si todas sus cuentas tienen saldo 0
+	private void eliminarCliente() {
+		int fila = tabla.getSelectedRow();
+		if (fila == -1) {
+			JOptionPane.showMessageDialog(this, "Selecciona un cliente de la tabla primero.", "Aviso",
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		Usuario cliente = modelo.getCliente(fila); // al MODELO, por el buscador
+
+		// No se puede eliminar si alguna cuenta tiene dinero o deuda.
+		// Se compara con 0,01 € y no con == 0 porque los double pueden guardar
+		// restos como 0.0000000001 tras varias operaciones.
+		for (Cuenta c : cliente.getCuentas()) {
+			if (Math.abs(c.getSaldo()) >= 0.01) {
+				JOptionPane.showMessageDialog(this,
+						"No se puede eliminar a " + cliente.getNombreCompleto() + ":\n"
+								+ "la cuenta " + c.getIban() + " tiene un saldo de "
+								+ String.format("%,.2f €", c.getSaldo()) + ".",
+						"No se puede eliminar", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+
+		int respuesta = JOptionPane.showConfirmDialog(this,
+				"¿Seguro que quieres eliminar a " + cliente.getNombreCompleto() + " (" + cliente.getNombreUsuario()
+						+ ") y sus " + cliente.getCuentas().size() + " cuenta(s)?",
+				"Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+
+		if (respuesta == JOptionPane.YES_OPTION) {
+			usuarios.remove(cliente); // se borra de la lista REAL del banco
+			mostrarClientes();        // tabla y totales se reconstruyen sin él
+			JOptionPane.showMessageDialog(this, "Cliente eliminado.", "Hecho", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 }
