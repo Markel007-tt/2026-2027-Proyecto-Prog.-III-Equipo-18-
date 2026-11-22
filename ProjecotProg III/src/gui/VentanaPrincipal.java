@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
 
 import domain.Usuario;
 
@@ -49,7 +48,7 @@ public class VentanaPrincipal extends JFrame {
 
 		if (usuario.esAdmin()) {
 			// El administrador solo dispone, por ahora, de la pestaña de gestión de clientes.
-			pestanas.addTab("Gestión de clientes", crearPanelPendiente());
+			pestanas.addTab("Gestión de clientes", new PanelAdmin(usuarios));
 		} else {
 			// Los clientes pueden consultar su resumen, transferir y ver su histórico.
 			pestanas.addTab("Resumen", crearPanelResumen());
@@ -94,13 +93,6 @@ public class VentanaPrincipal extends JFrame {
 		panelListadoCuentas.actualizar();
 		panelHistorico.actualizar(); // el histórico también se entera
 		panelTransferencia.recargarCuentas(); // el desplegable de Transferir también se entera
-	}
-	
-	// Crea un panel provisional para las secciones que todavía no están implementadas.
-	private JPanel crearPanelPendiente() {
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(new JLabel("Pendiente de implementar", SwingConstants.CENTER), BorderLayout.CENTER);
-		return panel;
 	}
 
 	// Cierra la sesión actual y vuelve a mostrar la ventana de inicio de sesión.
