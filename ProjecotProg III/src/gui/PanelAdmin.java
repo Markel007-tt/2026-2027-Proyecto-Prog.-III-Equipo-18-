@@ -6,11 +6,15 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableCellRenderer;
 
 import domain.Usuario;
@@ -23,10 +27,18 @@ public class PanelAdmin extends JPanel {
 	private List<Usuario> usuarios;                       // TODOS los usuarios del banco (la misma lista que crea Main)
 	private ModeloClientes modelo = new ModeloClientes(); // UN solo modelo para siempre
 	private JTable tabla = new JTable(modelo);            // la tabla pregunta a ese modelo
+	private JTextField txtBuscar = new JTextField(15);    // buscador por usuario o nombre
+	private JLabel lblTotales = new JLabel();             // nº de clientes y dinero total mostrados
 
 	public PanelAdmin(List<Usuario> usuarios) {
 		this.usuarios = usuarios;
 		setLayout(new BorderLayout());
+
+		// ---------- NORTH: buscador ----------
+		JPanel panelSuperior = new JPanel(); // FlowLayout por defecto: componentes en fila
+		panelSuperior.add(new JLabel("Buscar (usuario o nombre):"));
+		panelSuperior.add(txtBuscar);
+		add(panelSuperior, BorderLayout.NORTH);
 
 		// ---------- CENTER: tabla de clientes ----------
 		tabla.getTableHeader().setReorderingAllowed(false);           // no se pueden arrastrar las columnas
@@ -89,17 +101,59 @@ public class PanelAdmin extends JPanel {
 
 		add(new JScrollPane(tabla), BorderLayout.CENTER); // sin JScrollPane no se ven las cabeceras
 
+		// ---------- SOUTH: totales ----------
+		lblTotales.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // margen interior
+		add(lblTotales, BorderLayout.SOUTH);
+
+		// ---------- Eventos ----------
+
+		// Buscador: se filtra cada vez que cambia el texto
+		txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) { // se ha escrito algo
+				mostrarClientes();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) { // se ha borrado algo
+				mostrarClientes();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) { // cambios de estilo: no nos afectan
+			}
+		});
+
 		mostrarClientes(); // primera carga de la tabla
 	}
 
-	// Muestra en la tabla todos los usuarios del banco excepto el administrador
+	// Muestra en la tabla los clientes (sin el administrador) que cumplen la búsqueda
+	// y actualiza los totales de abajo
 	private void mostrarClientes() {
+		String busqueda = txtBuscar.getText().trim().toLowerCase();
+
 		List<Usuario> clientes = new ArrayList<>(); // lista NUEVA: la del banco no se toca
+		double dineroTotal = 0;
+
 		for (Usuario u : usuarios) {
-			if (!u.esAdmin()) {
+			if (u.esAdmin()) {
+				continue; // el administrador nunca aparece en la tabla
+			}
+
+			// Busca en el usuario y en el nombre completo, sin distinguir mayúsculas
+			String usuario = u.getNombreUsuario().toLowerCase();
+			String nombre = "";
+			if (u.getNombreCompleto() != null) {
+				nombre = u.getNombreCompleto().toLowerCase();
+			}
+
+			if (usuario.contains(busqueda) || nombre.contains(busqueda)) { // "" lo contiene todo
 				clientes.add(u);
+				dineroTotal = dineroTotal + u.getSaldoTotal();
 			}
 		}
+
 		modelo.setClientes(clientes);
+		lblTotales.setText(String.format("Clientes: %d   ·   Dinero total: %,.2f €", clientes.size(), dineroTotal));
 	}
 }
