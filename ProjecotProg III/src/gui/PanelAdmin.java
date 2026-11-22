@@ -3,11 +3,14 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,6 +20,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableCellRenderer;
 
+import domain.Cuenta;
 import domain.Usuario;
 
 // Pestaña "Gestión de clientes" del administrador: muestra y gestiona todos los clientes del banco
@@ -124,6 +128,19 @@ public class PanelAdmin extends JPanel {
 			}
 		});
 
+		// Doble clic en un cliente: muestra sus cuentas
+		tabla.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {                  // solo doble clic
+					int fila = tabla.rowAtPoint(e.getPoint());   // fila donde se ha hecho clic
+					if (fila != -1) {                            // -1 = clic en zona vacía
+						mostrarCuentas(modelo.getCliente(fila)); // el cliente se pide al MODELO (por el buscador)
+					}
+				}
+			}
+		});
+
 		mostrarClientes(); // primera carga de la tabla
 	}
 
@@ -155,5 +172,21 @@ public class PanelAdmin extends JPanel {
 
 		modelo.setClientes(clientes);
 		lblTotales.setText(String.format("Clientes: %d   ·   Dinero total: %,.2f €", clientes.size(), dineroTotal));
+	}
+
+	// Muestra en un cuadro de diálogo las cuentas de un cliente
+	private void mostrarCuentas(Usuario cliente) {
+		String texto = "Cliente: " + cliente.getNombreCompleto() + " (" + cliente.getNombreUsuario() + ")\n\n";
+
+		if (cliente.getCuentas().isEmpty()) {
+			texto = texto + "No tiene ninguna cuenta.";
+		} else {
+			for (Cuenta c : cliente.getCuentas()) {
+				texto = texto + String.format("%-12s %-10s %,12.2f €%n", c.getIban(), c.getTipo(), c.getSaldo());
+			}
+			texto = texto + String.format("%nSaldo total: %,.2f €", cliente.getSaldoTotal());
+		}
+
+		JOptionPane.showMessageDialog(this, texto, "Cuentas del cliente", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
