@@ -8,5 +8,6 @@ public enum ResultadoTransferencia {
 	CANTIDAD_INVALIDA,    // La cantidad es 0 o negativa
 	IBAN_NO_EXISTE,       // No hay ninguna cuenta del banco con ese IBAN
 	MISMA_CUENTA,         // El IBAN de destino es el mismo que el de origen
-	SALDO_INSUFICIENTE    // La cuenta de origen no puede permitirse enviar esa cantidad
+	SALDO_INSUFICIENTE ,   // La cuenta de origen no puede permitirse enviar esa cantidad
+	ERROR_BD 			// No se ha podido guardar la transferencia en la base de datos
 }

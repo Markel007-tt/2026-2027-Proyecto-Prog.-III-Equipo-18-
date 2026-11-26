@@ -145,6 +145,12 @@ public class VentanaRegistro extends JDialog {
             return;
         }
 
+        // El nombre de usuario no puede estar ya cogido por otro usuario.
+        if (padre.existeUsuario(usuario)) {
+            lblError.setText("Ese nombre de usuario ya existe");
+            return;
+        }
+
         // Creamos el usuario con los datos introducidos.
         Usuario nuevo = new Usuario(
                 usuario,
@@ -159,8 +165,13 @@ public class VentanaRegistro extends JDialog {
                 ciudad
         );
 
-        // Cerramos el registro y entramos con el nuevo usuario.
-        // Actualmente, el usuario no se guarda de forma permanente.
+        // Guardamos el usuario en la base de datos y en la lista de usuarios. Si falla, avisamos y no entramos.
+        if (!padre.registrar(nuevo)) {
+            lblError.setText("No se ha podido guardar el usuario en la base de datos");
+            return;
+        }
+
+        // Cerramos el registro y entramos con el nuevo usuario (que ya queda guardado de forma permanente).
         dispose();
         padre.entrarComo(nuevo);
     }

@@ -13,6 +13,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import db.GestorBD;
 import domain.Banco;
 import domain.Cuenta;
 import domain.Usuario;
@@ -125,6 +126,14 @@ public class PanelListadoCuentas extends JPanel {
 			nuevaCuenta = new domain.CuentaAhorro(nuevoIban, usuario.getNombreUsuario(), 0);
 		}
 			
+		// Primero guardamos la cuenta en la base de datos. Si falla, avisamos y no la añadimos al usuario,
+		// así la memoria y la base de datos siempre tienen las mismas cuentas.
+		if (!GestorBD.insertarCuenta(nuevaCuenta)) {
+			javax.swing.JOptionPane.showMessageDialog(this, "No se ha podido guardar la cuenta en la base de datos.",
+					"Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		// Añade la cuenta al usuario y pide a la ventana principal que redibuje los datos
 		usuario.getCuentas().add(nuevaCuenta);
 		alCambiarCuentas.run();
@@ -159,6 +168,12 @@ public class PanelListadoCuentas extends JPanel {
 		int seguro = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro que quieres borrar la cuenta " + iban + "?", "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION);
 		
 		if (seguro == javax.swing.JOptionPane.YES_OPTION) {
+			// Primero la borramos de la base de datos (con sus movimientos). Si falla, avisamos y no la quitamos de la lista.
+			if (!GestorBD.eliminarCuenta(iban)) {
+				javax.swing.JOptionPane.showMessageDialog(this, "No se ha podido eliminar la cuenta de la base de datos.",
+						"Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			usuario.getCuentas().remove(cuenta);
 			actualizar();
 			alCambiarCuentas.run();

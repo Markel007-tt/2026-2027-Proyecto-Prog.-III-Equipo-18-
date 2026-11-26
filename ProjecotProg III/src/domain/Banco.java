@@ -3,6 +3,8 @@ package domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import db.GestorBD;
+
 // Operaciones que afectan a VARIAS cuentas o a todo el banco.
 // Una transferencia toca dos cuentas, por eso no puede ser un método de Cuenta:
 // vive aquí. Todos los métodos son static, así que no hace falta crear un objeto Banco.
@@ -85,6 +87,12 @@ public class Banco {
 
 		// Si se ha podido sacar, se ingresa en el destino
 		destino.recibirTransferencia(cantidad, conceptoRecibida);
+
+		// Guardamos en la base de datos los dos saldos nuevos y los dos movimientos nuevos (en una sola transacción).
+		// Se hace aquí dentro, y no en la ventana, para que lo haga cualquiera que use transferir() (también los cajeros).
+		if (!GestorBD.guardarOperacion(origen, destino)) {
+			return ResultadoTransferencia.ERROR_BD; // La ventana avisará de que no se ha podido guardar
+		}
 		return ResultadoTransferencia.OK;
 	}
 	// Genera un IBAN aleatorio con el formato "ES01-XXXX" comprobando que no exista ya.

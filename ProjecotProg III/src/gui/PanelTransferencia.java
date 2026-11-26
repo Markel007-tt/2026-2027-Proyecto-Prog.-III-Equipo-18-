@@ -193,6 +193,13 @@ public class PanelTransferencia extends JPanel {
 		case CANTIDAD_INVALIDA:
 			mostrarError("La cantidad debe ser mayor que 0");
 			break;
+		case ERROR_BD:
+			// La transferencia ya se ha hecho en memoria, pero no se ha podido guardar en la base de datos.
+			// Refrescamos igualmente la pantalla para que muestre los saldos que hay ahora mismo en memoria.
+			recargarCuentas();
+			alTransferir.run();
+			mostrarError("La transferencia se ha hecho, pero no se ha podido guardar en la base de datos");
+			break;
 		}
 	}
 

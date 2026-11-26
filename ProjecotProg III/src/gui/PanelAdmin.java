@@ -23,6 +23,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableCellRenderer;
 
+import db.GestorBD;
 import domain.Cuenta;
 import domain.Usuario;
 
@@ -237,6 +238,12 @@ public class PanelAdmin extends JPanel {
 				"Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
 		if (respuesta == JOptionPane.YES_OPTION) {
+			// Primero lo borramos de la base de datos (con sus cuentas y movimientos). Si falla, no tocamos la lista.
+			if (!GestorBD.eliminarUsuario(cliente.getNombreUsuario())) {
+				JOptionPane.showMessageDialog(this, "No se ha podido eliminar al cliente de la base de datos.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			usuarios.remove(cliente); // se borra de la lista REAL del banco
 			mostrarClientes();        // tabla y totales se reconstruyen sin él
 			JOptionPane.showMessageDialog(this, "Cliente eliminado.", "Hecho", JOptionPane.INFORMATION_MESSAGE);

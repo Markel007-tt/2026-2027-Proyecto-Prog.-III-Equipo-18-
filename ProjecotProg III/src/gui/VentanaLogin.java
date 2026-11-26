@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import db.GestorBD;
 import domain.Usuario;
 
 // Ventana de inicio de sesión con opción para crear una cuenta nueva.
@@ -89,5 +90,26 @@ public class VentanaLogin extends JFrame {
 	void entrarComo(Usuario usuario) {
 		new VentanaPrincipal(usuario, usuarios).setVisible(true); // Pasamos el usuario actual y la lista completa a la ventana principal.
 		dispose(); // Cerramos esta ventana sin finalizar toda la aplicación.
+	}
+
+	// Indica si ya existe un usuario con ese nombre (sin distinguir mayúsculas, igual que el login).
+	// Lo usa la ventana de registro para no permitir dos usuarios con el mismo nombre.
+	boolean existeUsuario(String nombre) {
+		for (Usuario u : usuarios) {
+			if (u.getNombreUsuario().equalsIgnoreCase(nombre)) {
+				return true; // Encontrado: ya existe
+			}
+		}
+		return false; // Hemos recorrido toda la lista sin encontrarlo
+	}
+
+	// Guarda un usuario nuevo en la base de datos y en la lista de usuarios del programa.
+	// Devuelve false si no se ha podido guardar en la base de datos (en ese caso no se añade a la lista).
+	boolean registrar(Usuario nuevo) {
+		if (!GestorBD.insertarUsuario(nuevo)) {
+			return false;
+		}
+		usuarios.add(nuevo); // Ahora ya puede iniciar sesión otra vez y recibir transferencias
+		return true;
 	}
 }
