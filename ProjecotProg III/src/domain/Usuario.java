@@ -52,6 +52,8 @@ public class Usuario {
 	public boolean comprobarContrasena(String contrasena) {
 		return this.contrasena.equals(contrasena); // Con Strings se usa equals
 	}
+	// Solo para GestorBD: necesita la contraseña para guardarla en la base de datos
+	public String getContrasena() { return contrasena; }
 
 	// Suma el saldo de todas sus cuentas
 	public double getSaldoTotal() {

@@ -27,4 +27,6 @@ public class CuentaCorriente extends Cuenta {
 	public String getTipo() {
 		return "Corriente";
 	}
+	// Solo para GestorBD: necesita el límite de descubierto para guardarlo
+	public double getLimiteDescubierto() { return limiteDescubierto; }
 }
